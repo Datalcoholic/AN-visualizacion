@@ -5,9 +5,10 @@
         <svg class="graph-container" width="1100" height="700">
           <rect width="1100" height="620" fill="#6d6d6d41" />
         </svg>
+        <Scrollama @step-enter="stepEnterHandler" :debug="true" :offset="0.5">
+          <scroll_text :stepsText="stepsText" />
+        </Scrollama>
       </div>
-      <scroll_text :stepsText="stepsText" />
-
       <div class="container-2"></div>
     </div>
   </div>
@@ -15,12 +16,9 @@
 
 <script>
 import { TweenMax, TimelineMax } from "gsap";
-//import ScrollMagic from "scrollmagic";
 import scroll_text from "./components/scroll_texts.vue";
-//const ScrollMagic = require("scrollmagic");
-const ScrollMagic = require("scrollmagic");
-require("scrollmagic/scrollmagic/uncompressed/plugins/animation.gsap");
-require("scrollmagic/scrollmagic/uncompressed/plugins/debug.addIndicators.js");
+import "intersection-observer"; // for cross-browser support
+import Scrollama from "vue-scrollama";
 
 const steps = require("./text");
 console.log(steps);
@@ -28,7 +26,8 @@ console.log(steps);
 export default {
   name: "app",
   components: {
-    scroll_text
+    scroll_text,
+    Scrollama
   },
   data() {
     return {
@@ -36,15 +35,13 @@ export default {
     };
   },
 
-  mounted() {
-    const controller = new ScrollMagic.Controller();
+  mounted() {},
 
-    const stepScene = new ScrollMagic.Scene({
-      triggerElement: ".step"
-    })
-      .setTween(".step", 0.5, { opacity: 1 })
-      .addIndicators({ name: "test" })
-      .addTo(controller);
+  methods: {
+    stepEnterHandler({ element, index, direction }) {
+      // handle the step-event as required here
+      console.log(element, index, direction);
+    }
   }
 };
 </script>
@@ -56,33 +53,44 @@ export default {
 }
 
 .master-container {
-  height: 250%vh;
+  height: 250%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border-color: black;
-  border-style: solid;
-  border-width: 2.5px;
+  /* border-color: black; */
+  /* border-style: solid;
+  border-width: 2.5px; */
 }
 .container-1 {
-  position: sticky;
   top: 0;
   height: 1000vh;
   width: 100%;
-  border-style: solid;
-  border-color: rgb(89, 0, 255);
-  border-width: 3.5px;
+  /* border-style: solid; */
+  /* border-color: rgb(89, 0, 255); */
+  /* border-width: 3.5px; */
 }
 .container-2 {
+  height: 100vh;
   position: sticky;
   top: 0px;
-  height: 1000em;
-  border-style: solid;
-  border-color: rgb(89, 0, 255);
-  border-width: 3.5px;
+  /* border-style: solid; */
+  /* border-color: rgb(89, 0, 255); */
+  /* border-width: 3.5px; */
+}
+
+.scrollama-steps {
+  position: relative;
+  padding: 0 30rem;
+  margin: 0;
+  border: 2px solid green;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .graph-container {
+  position: sticky;
+  top: 10px;
   margin: 20px 50%;
   transform: translate(-50%);
 }
