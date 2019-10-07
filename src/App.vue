@@ -14,8 +14,15 @@
 </template>
 
 <script>
-const steps = require("./text");
+import { TweenMax, TimelineMax } from "gsap";
+//import ScrollMagic from "scrollmagic";
 import scroll_text from "./components/scroll_texts.vue";
+//const ScrollMagic = require("scrollmagic");
+const ScrollMagic = require("scrollmagic");
+require("scrollmagic/scrollmagic/uncompressed/plugins/animation.gsap");
+require("scrollmagic/scrollmagic/uncompressed/plugins/debug.addIndicators.js");
+
+const steps = require("./text");
 console.log(steps);
 
 export default {
@@ -27,13 +34,25 @@ export default {
     return {
       stepsText: steps
     };
+  },
+
+  mounted() {
+    const controller = new ScrollMagic.Controller();
+
+    const stepScene = new ScrollMagic.Scene({
+      triggerElement: ".step"
+    })
+      .setTween(".step", 0.5, { opacity: 1 })
+      .addIndicators({ name: "test" })
+      .addTo(controller);
   }
 };
 </script>
 
 <style>
+@import url("https://fonts.googleapis.com/css?family=Barlow+Condensed:400,600,900&display=swap");
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-family: "Barlow Condensed", Helvetica, Arial, sans-serif;
 }
 
 .master-container {
@@ -55,6 +74,7 @@ export default {
   border-width: 3.5px;
 }
 .container-2 {
+  position: sticky;
   top: 0px;
   height: 1000em;
   border-style: solid;
