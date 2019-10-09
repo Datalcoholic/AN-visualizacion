@@ -2,7 +2,8 @@
   <div id="app">
     <div class="master-container">
       <div class="container-1">
-        <chart v-bind="{bancadas}" />
+        <chart v-bind="{bancadas, count}" />
+        <!-- <newChart v-bind="{bancadas}" /> -->
 
         <Scrollama @step-enter="stepTextHandler" :debug="true" :offset="0.8">
           <div v-for="(step, i) in stepsText" :key="i" :class="step" :stnumber="['step_'+[i+1]]">
@@ -19,20 +20,23 @@
 import { TweenMax, TimelineMax } from "gsap";
 import Scrollama from "vue-scrollama";
 import chart from "./components/chart";
+import NewChart from "./components/newChart";
+
 const steps = require("./text");
 
 const bancadasArray = ["oficialismo", "concertacion", "bancada3", "oposicion"];
-
 export default {
   name: "app",
   components: {
     Scrollama,
-    chart
+    chart,
+    NewChart
   },
   data() {
     return {
       stepsText: steps,
-      bancadas: bancadasArray
+      bancadas: bancadasArray,
+      count: [0, 0, 0, 0]
     };
   },
 
@@ -64,6 +68,7 @@ export default {
 
 .master-container {
   height: 250%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -74,7 +79,7 @@ export default {
 .container-1 {
   top: 0;
   height: 900vh;
-  width: 100%;
+
   /* border-style: solid; */
   /* border-color: rgb(89, 0, 255); */
   /* border-width: 3.5px; */
