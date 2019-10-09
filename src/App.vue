@@ -2,11 +2,12 @@
   <div id="app">
     <div class="master-container">
       <div class="container-1">
-        <svg class="graph-container" width="1100" height="700">
-          <rect width="1100" height="620" fill="#6d6d6d41" />
-        </svg>
-        <Scrollama @step-enter="stepEnterHandler" :debug="true" :offset="0.5">
-          <scroll_text :stepsText="stepsText" />
+        <chart v-bind="{bancadas}" />
+
+        <Scrollama @step-enter="stepTextHandler" :debug="true" :offset="0.8">
+          <div v-for="(step, i) in stepsText" :key="i" :class="step" :stnumber="['step_'+[i+1]]">
+            <p>{{step.step}}</p>
+          </div>
         </Scrollama>
       </div>
       <div class="container-2"></div>
@@ -16,22 +17,22 @@
 
 <script>
 import { TweenMax, TimelineMax } from "gsap";
-import scroll_text from "./components/scroll_texts.vue";
-import "intersection-observer"; // for cross-browser support
 import Scrollama from "vue-scrollama";
-
+import chart from "./components/chart";
 const steps = require("./text");
-console.log(steps);
+
+const bancadasArray = ["oficialismo", "concertacion", "bancada3", "oposicion"];
 
 export default {
   name: "app",
   components: {
-    scroll_text,
-    Scrollama
+    Scrollama,
+    chart
   },
   data() {
     return {
-      stepsText: steps
+      stepsText: steps,
+      bancadas: bancadasArray
     };
   },
 
@@ -41,6 +42,15 @@ export default {
     stepEnterHandler({ element, index, direction }) {
       // handle the step-event as required here
       console.log(element, index, direction);
+      TweenMax.to(element, 1, { opacity: 1 });
+    },
+
+    stepTextHandler({ element, index, direction }) {
+      if (direction === "down") {
+        TweenMax.to(element, 0.8, { opacity: 1 });
+      } else {
+        TweenMax.to(element, 0.2, { opacity: 0 });
+      }
     }
   }
 };
@@ -63,7 +73,7 @@ export default {
 }
 .container-1 {
   top: 0;
-  height: 1000vh;
+  height: 900vh;
   width: 100%;
   /* border-style: solid; */
   /* border-color: rgb(89, 0, 255); */
@@ -86,12 +96,24 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
 }
 
-.graph-container {
-  position: sticky;
-  top: 10px;
-  margin: 20px 50%;
-  transform: translate(-50%);
+.step {
+  opacity: 0;
+  padding: 5vh 0;
+  margin-top: 20em;
+  background: rgba(255, 255, 255, 0.39);
+  width: 50vw;
+  display: flex;
+  border: 1px solid blue;
+  border-radius: 14px;
+}
+
+.step > p {
+  font-family: "Barlow";
+  font-weight: 400;
+  font-size: 16.5px;
+  margin: 10px;
 }
 </style>
