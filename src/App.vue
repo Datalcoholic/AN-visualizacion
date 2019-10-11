@@ -2,11 +2,16 @@
   <div id="app">
     <div class="master-container">
       <div class="container-1">
-        <chart v-bind="{bancadas, count}" />
+        <chart v-bind="{bancadas}" />
         <!-- <newChart v-bind="{bancadas}" /> -->
 
-        <Scrollama @step-enter="stepTextHandler" :debug="true" :offset="0.8">
-          <div v-for="(step, i) in stepsText" :key="i" :class="step" :stnumber="['step_'+[i+1]]">
+        <Scrollama
+          @step-enter="stepTextHandler"
+          @step-exit="textleavaeHandler"
+          :debug="true"
+          :offset="0.7"
+        >
+          <div v-for="(step, i) in stepsText" :key="i" :class="step" :id="['step_'+[i+1]]">
             <p>{{step.step}}</p>
           </div>
         </Scrollama>
@@ -24,7 +29,11 @@ import NewChart from "./components/newChart";
 
 const steps = require("./text");
 
-const bancadasArray = ["oficialismo", "concertacion", "bancada3", "oposicion"];
+const bancadasArray = [
+  { name: "Oficialismo", count: 0 },
+  // { name: "Disidentes Psuv", count: 0 },
+  { name: "Oposicion", count: 0 }
+];
 export default {
   name: "app",
   components: {
@@ -35,8 +44,7 @@ export default {
   data() {
     return {
       stepsText: steps,
-      bancadas: bancadasArray,
-      count: [0, 0, 0, 0]
+      bancadas: bancadasArray
     };
   },
 
@@ -50,10 +58,26 @@ export default {
     },
 
     stepTextHandler({ element, index, direction }) {
-      if (direction === "down") {
-        TweenMax.to(element, 0.8, { opacity: 1 });
-      } else {
-        TweenMax.to(element, 0.2, { opacity: 0 });
+      // MAneja la opacidad de los step
+      switch (direction) {
+        case "down":
+          TweenMax.to(element, 0.8, { opacity: 1 });
+          break;
+
+        default:
+          TweenMax.to(element, 0.2, { opacity: 0 });
+          break;
+      }
+      // Agrega elementos a Bancadas
+      if (element.id === "step_1" && direction === "down") {
+        this.bancadas.push({ name: "Concertacion", count: 0 });
+      } else if (element.id === "step_1" && direction === "up") {
+        this.bancadas = this.bancadas.filter(d => d.name !== "Concertacion");
+      }
+    },
+    textleavaeHandler({ element, index, direction }) {
+      if (element.id === "step_1" && direction === "down") {
+        //console.log(element);
       }
     }
   }
@@ -108,6 +132,7 @@ export default {
   opacity: 0;
   padding: 5vh 0;
   margin-top: 20em;
+  margin-bottom: 0rem;
   background: rgba(255, 255, 255, 0.39);
   width: 50vw;
   display: flex;
