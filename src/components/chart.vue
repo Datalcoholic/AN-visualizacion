@@ -5,6 +5,7 @@
         <transition-group @enter="Enter" @leave="Leave" :css="false" tag="g">
           <rect
             class="back_svg"
+            :id="ban.name"
             v-for="(ban) in bancadasArray"
             :key="ban.key"
             :x="ban.x_rect"
@@ -25,7 +26,7 @@
           <text
             class="textCount_svg"
             v-for="(ban, num) in bancadasArray"
-            :key="num + 30"
+            :key="num + 2"
             :x="[ban.x_rect + 85]"
             :y="[ban.height + 100]"
             :fill="ban.fill_text"
@@ -41,16 +42,20 @@ import * as d3 from "d3";
 import { TweenMax, TimeLineMax } from "gsap";
 
 const colors = ["#fb3640", "#772271", "#579633", "#2e86ab"];
+const width = 1100;
+const fsvg_width = width / 2;
 
 export default {
   name: "chart",
-  props: ["bancadas"],
+  props: ["bancadas", "bancadasColorScale"],
   data() {
     return {
-      width: 1100,
+      width: width,
       height: 800,
       svg_height: null,
-      espacios: null
+      espacios: null,
+      newBancadas: [],
+      oldBancadas: []
     };
   },
 
@@ -80,6 +85,24 @@ export default {
     }
   },
 
+  created() {},
+
+  watch: {
+    bancadasArray(newVal, oldVal) {
+      console.log("new", newVal);
+      console.log("old", oldVal);
+
+      this.newBancadas = newVal;
+      this.oldBancadas = oldVal;
+
+      // this.$set(this.newBancadas, newVal);
+      // this.$set(this.oldBancadas, oldVal);
+
+      //this.svg_width = this.spacios();
+      //this.$set(this.bancadasArray, newVal);
+    }
+  },
+
   methods: {
     // Calcula distribucion de los contenedores de bancadas
     bancBands(value) {
@@ -98,7 +121,7 @@ export default {
     bancColors(values, i) {
       const col = d3
         .scaleOrdinal()
-        .domain(this.banArray)
+        .domain(this.bancadasColorScale)
         .range(colors);
 
       return col(values, i);
@@ -106,20 +129,55 @@ export default {
 
     spacios() {
       return (this.width - 50) / this.bancadas.length;
+      console.log("spacios", (this.width - 50) / this.bancadas.length);
     },
 
     //transitions bancadas
-    beforeEnter(el) {
-      TweenMax.set(el);
-    },
-    Enter(el) {
-      console.log("el", el);
+    beforeEnter(el) {},
+    Enter(el, done) {
+      try {
+        const tl = new TimelineMax({});
+        tl.from(el, 0.7, { transformOrigin: "100% 50%", scaleX: 0 }).fromTo(
+          this.$el.querySelector("#Oposicion"),
+          0.7,
+          { width: this.oldBancadas[0].width },
+          { width: this.newBancadas[0].width },
+          "=-0.7"
+        );
 
-      //TweenMax.from(["#"], 2, { transformOrigin: "right", width: 20 });
-      TweenMax.from(el, 2, { transformOrigin: "right", width: 20 });
+        done();
+      } catch (error) {
+        console.log(error);
+      }
+
+      console.log("element", this.$el.querySelector("#Oposicion"));
     },
+
     Leave(el, done) {
-      TweenMax.to(el, 0.5, { transformOrigin: "left", width: 0 });
+      const tl = new TimelineMax({});
+      tl.to(el, 0.5, { scaleX: 0 })
+        .fromTo(
+          this.$el.querySelector("#Oposicion"),
+          0.5,
+          { width: this.oldBancadas[0].width },
+          { width: this.newBancadas[0].width },
+          "=-0.5"
+        )
+        .fromTo(
+          this.$el.querySelector("#Concertacion"),
+          0.5,
+          { width: this.oldBancadas[0].width },
+          { width: this.newBancadas[0].width },
+          "=-0.5"
+        )
+        .fromTo(
+          this.$el.querySelector("#Oficialismo"),
+          0.5,
+          { width: this.oldBancadas[0].width },
+          { width: this.newBancadas[0].width },
+          "=-0.5"
+        );
+      done();
     }
   }
 };
@@ -133,16 +191,16 @@ export default {
 .graph-container {
   margin: 20px 50%;
   transform: translate(-50%);
-  background: rgb(232, 232, 233);
+  /* background: rgb(232, 232, 233); */
 }
 /* .bancadas_containers {
   transform: translate(-55px);
 } */
 
 .back_svg {
-  fill: #e2e2e2;
-  stroke: #8b8a8a;
-  stroke-width: 1px;
+  fill: #f8f8f8;
+  stroke: #d8d8d8;
+  stroke-width: 1.5px;
 }
 
 .marcador {

@@ -2,15 +2,10 @@
   <div id="app">
     <div class="master-container">
       <div class="container-1">
-        <chart v-bind="{bancadas}" />
+        <chart v-bind="{bancadas, bancadasColorScale}" />
         <!-- <newChart v-bind="{bancadas}" /> -->
 
-        <Scrollama
-          @step-enter="stepTextHandler"
-          @step-exit="textleavaeHandler"
-          :debug="true"
-          :offset="0.7"
-        >
+        <Scrollama @step-enter="stepTextHandler" :debug="true" :offset="0.85" threshold="50">
           <div v-for="(step, i) in stepsText" :key="i" :class="step" :id="['step_'+[i+1]]">
             <p>{{step.step}}</p>
           </div>
@@ -25,26 +20,29 @@
 import { TweenMax, TimelineMax } from "gsap";
 import Scrollama from "vue-scrollama";
 import chart from "./components/chart";
-import NewChart from "./components/newChart";
 
 const steps = require("./text");
 
 const bancadasArray = [
-  { name: "Oficialismo", count: 0 },
   // { name: "Disidentes Psuv", count: 0 },
-  { name: "Oposicion", count: 0 }
+  { name: "Oposicion", count: 112 }
 ];
 export default {
   name: "app",
   components: {
     Scrollama,
-    chart,
-    NewChart
+    chart
   },
   data() {
     return {
       stepsText: steps,
-      bancadas: bancadasArray
+      bancadas: bancadasArray,
+      bancadasColorScale: [
+        "Oficialismo",
+        "Concertacion",
+        "Disidentes Psuv",
+        "Oposicion"
+      ]
     };
   },
 
@@ -59,26 +57,44 @@ export default {
 
     stepTextHandler({ element, index, direction }) {
       // MAneja la opacidad de los step
-      switch (direction) {
-        case "down":
-          TweenMax.to(element, 0.8, { opacity: 1 });
-          break;
+      // switch (direction) {
+      //   case "down":
+      //     TweenMax.to(element, 0.5, { opacity: 1 });
+      //     break;
 
-        default:
-          TweenMax.to(element, 0.2, { opacity: 0 });
-          break;
-      }
+      //   default:
+      //     TweenMax.to(element, 0.2, { opacity: 0 });
+      //     break;
+      // }
+      console.log(`${element.id}_${direction}`);
       // Agrega elementos a Bancadas
-      if (element.id === "step_1" && direction === "down") {
-        this.bancadas.push({ name: "Concertacion", count: 0 });
-      } else if (element.id === "step_1" && direction === "up") {
-        this.bancadas = this.bancadas.filter(d => d.name !== "Concertacion");
-      }
-    },
-    textleavaeHandler({ element, index, direction }) {
-      if (element.id === "step_1" && direction === "down") {
-        //console.log(element);
-      }
+      // switch (`${element.id}_${direction}`) {
+      //   case "step_1_down":
+      //     console.log("elemen", element.id);
+      //   case "step_1_up":
+      //     console.log("up", element.id);
+
+      //     break;
+
+      //   default:
+      //     console.log("test");
+      //     break;
+      // }
+      // if (element.id === "step_1" && direction === "down") {
+      //   //this.bancadas.splice(1, 0, { name: "Concertacion", count: 0 });
+      //   this.bancadas.push({ name: "Concertacion", count: 6 });
+
+      // } else if (element.id === "step_1" && direction === "up") {
+      //   this.bancadas = this.bancadas.filter(d => d.name !== "Concertacion");
+      // } else if (element.id === "step_2" && direction === "down") {
+      //   this.bancadas.push({ name: "Oficialismo", count: 55 });
+      // } else if (element.id === "step_2" && direction === "up") {
+      //   this.bancadas = this.bancadas.filter(d => d.name !== "Oficialismo");
+      // } else if (element.id === "step_3" && direction === "down") {
+      //   this.bancadas.push({ name: "Disidentes Psuv", count: 0 });
+      // } else if (element.id === "step_3" && direction === "up") {
+      //   this.bancadas = this.bancadas.filter(d => d.name !== "Disidentes Psuv");
+      // }
     }
   }
 };
@@ -121,7 +137,7 @@ export default {
   position: relative;
   padding: 0 30rem;
   margin: 0;
-  border: 2px solid green;
+  /* border: 2px solid green; */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -129,7 +145,7 @@ export default {
 }
 
 .step {
-  opacity: 0;
+  opacity: 1;
   padding: 5vh 0;
   margin-top: 20em;
   margin-bottom: 0rem;
